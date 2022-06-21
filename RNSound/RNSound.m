@@ -17,19 +17,19 @@
         [userInfo[@"AVAudioSessionInterruptionTypeKey"] longValue];
     AVAudioPlayer *player = [self playerForKey:self._key];
     if (audioSessionInterruptionType == AVAudioSessionInterruptionTypeEnded) {
-        if (player) {
+        if (player && player.isPlaying) {
             [player play];
             [self setOnPlay:YES forPlayerKey:self._key];
         }
     }
-    else if (audioSessionRouteChangeReason ==
+    if (audioSessionRouteChangeReason ==
         AVAudioSessionRouteChangeReasonOldDeviceUnavailable) {
         if (player) {
             [player pause];
             [self setOnPlay:NO forPlayerKey:self._key];
         }
     }
-    else if (audioSessionInterruptionType == AVAudioSessionInterruptionTypeBegan) {
+    if (audioSessionInterruptionType == AVAudioSessionInterruptionTypeBegan) {
         if (player) {
             [player pause];
             [self setOnPlay:NO forPlayerKey:self._key];
@@ -241,12 +241,7 @@ RCT_EXPORT_METHOD(play
         addObserver:self
            selector:@selector(audioSessionChangeObserver:)
                name:AVAudioSessionRouteChangeNotification
-             object:[AVAudioSession sharedInstance]];
-    [[NSNotificationCenter defaultCenter]
-        addObserver:self
-           selector:@selector(audioSessionChangeObserver:)
-               name:AVAudioSessionInterruptionNotification
-             object:[AVAudioSession sharedInstance]];
+             object:nil];
     self._key = key;
     AVAudioPlayer *player = [self playerForKey:key];
     if (player) {
